@@ -24,6 +24,7 @@ type Scope struct {
 	skipLeft        bool
 	fields          *[]*Field
 	selectAttrs     *[]string
+	hint            string
 }
 
 // IndirectValue return scope's reflect value's indirect value
@@ -352,7 +353,7 @@ func (scope *Scope) CombinedConditionSql() string {
 
 // Raw set raw sql
 func (scope *Scope) Raw(sql string) *Scope {
-	scope.SQL = strings.Replace(sql, "$$$", "?", -1)
+	scope.SQL = scope.hint + strings.Replace(sql, "$$$", "?", -1)
 	return scope
 }
 

@@ -28,6 +28,8 @@ type DB struct {
 	callbacks     *Callback
 	dialect       Dialect
 	singularTable bool
+
+	hint string
 }
 
 // Open initialize a new db connection, need to import driver first, e.g:
@@ -167,7 +169,7 @@ func (s *DB) SingularTable(enable bool) {
 func (s *DB) NewScope(value interface{}) *Scope {
 	dbClone := s.clone()
 	dbClone.Value = value
-	return &Scope{db: dbClone, Search: dbClone.search.clone(), Value: value}
+	return &Scope{db: dbClone, Search: dbClone.search.clone(), Value: value, hint: s.hint}
 }
 
 // QueryExpr returns the query as expr object
@@ -473,6 +475,11 @@ func (s *DB) Table(name string) *DB {
 	return clone
 }
 
+func (s *DB) Comment(str string) *DB {
+	s.hint = str
+	return s
+}
+
 // Debug start debug mode
 func (s *DB) Debug() *DB {
 	return s.clone().LogMode(true)
@@ -748,6 +755,7 @@ func (s *DB) clone() *DB {
 		Value:             s.Value,
 		Error:             s.Error,
 		blockGlobalUpdate: s.blockGlobalUpdate,
+		hint:              s.hint,
 	}
 
 	for key, value := range s.values {
